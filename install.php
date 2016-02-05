@@ -7,16 +7,11 @@
   <meta name="description" content="">
   <meta name="keywords" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <!-- CSS -->
-  <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css'>
-  <link type="text/css" rel="stylesheet" href="css/reset.css">
-  <link type="text/css" rel="stylesheet" href="css/theme.css">
-  <link type="text/css" rel="stylesheet" href="css/style.css">
-
+  
   <?php
-    include_once('classes/collection/collection.php');
-    include_once('classes/language/language.php');
-    include_once('classes/snippet/snippet.php');
+    include_once('classes/snippet/definition.php');
+    include_once('classes/tag/definition.php');
+    include_once('classes/code/definition.php');    
   ?>
 </head>
 <body>
@@ -24,45 +19,46 @@
     <h1>Installation</h1>
     <?php 
 
-    // Create table collections
-    $Collections = new Collection();
-    $Collections->install();
-    // Add default collection
-    $Collections->add('');
-    $Collections->add('jQuery examples');
-    $Collections->add('PhaserJS');
-    $Collections->add('Google Plus');
-
-    // Create table languages
-    $Languages = new Language();
-    $Languages->install();
-    // Add default language
-    $Languages->add('Plain text','text');
-    $Languages->add('C++','C++');
-    $Languages->add('C#','C#');
-    $Languages->add('Coffeescript','Coffeescript');
-    $Languages->add('CSS','CSS');
-    $Languages->add('Go','Go');
-    $Languages->add('HTML','HTML');
-    $Languages->add('Java','Java');
-    $Languages->add('JavaScript','JavaScript');
-    $Languages->add('Node.js','Node.js');
-    $Languages->add('PHP','PHP');
-    $Languages->add('Python','Python');
-    $Languages->add('Ruby','Ruby');
-    $Languages->add('Shell script','Shell script');
-    $Languages->add('Salesforce Apex','Salesforce Apex');
-    $Languages->add('Salesforce Lightning','Salesforce Lightning');
-
     // Create table snippets
     $Snippets = new Snippet();
     $Snippets->install();
-    // Add default snippet
-    $Snippets->add('jquery Sandbox', 'es una prueba', '.item{display:none;}',2,5);
-    $Snippets->add('jquery Sandbssasox', 'es una prueba', 'var item = function(irt){var r = 45;}',2,9);
-    $Snippets->add('jquery Sandasdasbox', 'es una prueba', 'yiouyi',4,7);
-    $Snippets->add('jquery Sandsdsbox', 'es una prueba', 'php echo $item;',3,11);
 
+    // Create table tags
+    $Tags = new Tag();
+    $Tags->install();
+
+    // Create table TagBySnippet
+    $TagBySnippets = new TagBySnippet();
+    $TagBySnippets->install();
+
+    // Create table codes
+    $Codes = new Code();
+    $Codes->install();
+
+
+    ///////////////
+    // Add some tags
+    $Tags->add("Javascript","#39A4FF");// 1
+    $Tags->add("CSS","#CD6CFF");// 2
+    $Tags->add("HTML","#C18F7D");// 3
+    $Tags->add("Phaser JS","#A0B300");// 4
+
+    // Add some snippets
+    for($i = 1;$i<=20;$i++){
+      $Snippets->add("Snippet ". $i,"Bla, bla, bla...");
+    }
+    
+    // some tags
+    for($i = 1;$i<=8;$i++){
+      $TagBySnippets->add($i,1);
+    }
+    for($i = 4;$i<=14;$i++){
+      $TagBySnippets->add($i,2);
+    }
+    for($i = 10;$i<=20;$i++){
+      $TagBySnippets->add($i,3);
+    }
+    
     
 
     ?>

@@ -1,12 +1,17 @@
 <?php 
-  include_once('snippet.php');
+  include_once('definition.php');
 
-  $Snippet = new Snippet();
+  $Snippet = new Snippet();  
 
-  if( isset($_POST['edit']) ) {
-    $Snippet->editInfo($_POST['id'],$_POST['title'],$_POST['detail'],$_POST['collection_id'],$_POST['language_id']);
+  if( isset($_POST['saveTitle']) ) {   
+      // Update color
+      $Snippet->updateTitle($_POST['id'],$_POST['title']);    
   }
-  if( isset($_POST['saveContent']) ) {
-  	$Snippet->saveContent($_POST['id'],$_POST['content']);
+  if( isset($_POST['saveDescription']) ) {   
+      // Update color
+      $Snippet->updateDescription($_POST['id'],$_POST['description']);    
   }
+
+  exit();
+  
 ?>

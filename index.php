@@ -8,100 +8,150 @@
   <meta name="keywords" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
   <!-- CSS -->
-  <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet/less" type="text/css" href="css/style.less" />
 </head>
 <body>
-  <div id="spp-top-bar"></div>
-  <div id="spp-side-bar">
-    <div id="spp-side-bar-container">
-      <div class="collapser show" id="collection-section">
-        <div class="collapser-header">
-          <div class="collapser-trigger">COLLECTIONS</div>
-          <a data-bind="visible:!emptyList(),click: add" href="" title="Add new collection" class="btn btn-small float-right"><i class="fa fa-plus"></i> Add</a>
-        </div>        
-        <div class="collapser-content">
-          <div class="empty-list-message-cont" data-bind="visible:emptyList">
-            <div class="empty-list-message">Not collections yet</div>
-            
-            <a data-bind="click: add" href="" class="btn btn-primary btn-small"><i class="fa fa-plus"></i> Add new collection</a>
-          </div>
-          <ul id="collection-list" data-bind="visible:!emptyList(),foreach: list">
-            <li data-bind="visible:visible,css: { editing:editing,deleting:deleting,current:current}">
-              <div class="collection-editor">
-                <input type="text" placeholder="Untitled" data-bind="value:title,hasFocus:editing,event:{blur:save}"/>
-                <span class="action delete" data-bind="event:{mousedown:deleteConfirm}" title="Delete collection"><i class="fa fa-close"></i></span>                
-              </div>
-              <div class="collection-delete-confirm">
-                Delete? <span class="action no-delete" data-bind="click:deleteNo" title="Keep collection"><i class="fa fa-check"></i> no</span> <span class="action delete yes-delete" data-bind="click:deleteYes" title="Delete collection"><i class="fa fa-close"></i> yes</span>
-              </div>
-              <span class="title" data-bind="text:title,click:setCurrent"></span>
-              <span class="action edit" data-bind="click:edit"><i class="fa fa-pencil"></i> edit</span>
-              <span class="num" data-bind="text:num_snippets,click:setCurrent"></span>
-            </li>
-          </ul>          
-        </div>
-      </div>
-      <div class="collapser show" id="language-section">
-        <div class="collapser-header">
-          <div class="collapser-trigger">LANGUAGES</div>
-        </div>
-          <div class="collapser-content">
-            <ul id="language-list" data-bind="foreach: list">
-            <li data-bind="css: {current:current},click:setCurrent">
-              <span class="title" data-bind="text:title"></span>
-              <span class="num" data-bind="text:num_snippets"></span>
-            </li>
-          </ul>   
-          </div>
-      </div>
-    </div>
-  </div>
-  <div id="spp-side-bar-selector">
-    <div id="snippet-list-section">
-      <ul id="snippet-list" data-bind="foreach: list">    
-        <li data-bind="css: {current:current},click:setCurrent">
-          <div class="title" data-bind="text: title"></div>
-          <div class="row">
-            <div class="col-6">
-              <div class="spp-group">COLLECTION</div>
-              <div class="spp-group-title" data-bind="text: collection_title"></div>
-            </div>
-            <div class="col-6">
-              <div class="spp-group">LANGUAGE</div>
-              <div class="spp-group-title" data-bind="text: language_title"></div>
-            </div>
-          </div>
-          <span class="edit" data-bind=""><i class="fa fa-pencil"></i> edit</span>
-        </li>
-      </ul>
-      <div id="snippet-list-toolbar">
-        <a href="" class="btn btn-primary add-new-snippet"><i class="fa fa-plus"></i> Add new Snippet</a>
-      </div>
-    </div>
-  </div>
   
-  <div id="spp-content" data-bind="css: {editMode:editMode}">
-    <div class="spp-top-bar-content">
-        <div class="snippet-title" data-bind="text:title"></div>
-        <span class="btn-edit-content edit" title="Edit the code" data-bind="click:edit"><i class="fa fa-pencil"></i> Edit</span>
-        <span class="btn-edit-content save" title="Save the current code" data-bind="click:save"><i class="fa fa-pencil"></i> Save</span>
+  <section class="side-section">
+    <div class="container">
+      <div class="brand">
+        <h1>Snippets</h1>
+      </div>
+      <ul class="tag-list main-tag-list" id="main-tag-list">
+        <li class="tag-li-element" data-bind="css:{current:current},click:setCurrent">
+          <div class="tag-section">
+            <div class="tag-color-btn">
+              <i class="fa fa-circle circle-sample"></i>
+            </div>          
+            <div class="tag-title">
+              All snippets
+            </div>
+            <div class="tag-num" data-bind="text:num"></div>
+          </div>
+        </li>        
+      </ul>
+      <div class="tit">Tags</div>
+      <div  id="tag-list">
+        <ul class="tag-list" data-bind="foreach: list">
+          <li class="tag-li-element" data-bind="css:{current:current},style:{backgroundColor: current() ? color : 'transparent'}">
+            <div class="tag-section" data-bind="visible:!editMode()">
+              <div class="tag-color-btn" title="Set color tag">
+                <i class="fa fa-circle circle-sample" data-bind="style:{color: current() ? '#FFF' : color}"></i>
+                <div class="tag-color-selector">
+                  <span class="triang"></span>
+                  <label>Color:</label>
+                  <ul class="tag-color-selector-cuad" data-bind="foreach: colorList">
+                    <li data-bind="css:{current:current},style:{backgroundColor:col},click:setColor"></li>
+                  </ul>
+                </div>
+              </div>          
+              <div class="tag-title" data-bind="text:title,click:setCurrent"></div>
+              <div class="tag-num" data-bind="text:num"></div>
+              <div class="tag-edit-btn" data-bind="click:editTitle" title="Edit tag title">
+                <i class="fa fa-pencil"></i>
+              </div>
+            </div>          
+            <div class="tag-section" data-bind="visible:editAndNoDeleteMode" style="display:none">
+              <div class="input-title-edit">
+                <input type="text" data-bind="value:title,hasFocus:editMode,event:{blur:saveTitle},keyEnterPressed:saveTitle" placeholder="Some tag title..."/>
+              </div>
+              <div class="tag-delete-btn" data-bind="event:{mousedown:deleteTag}" title="Delete tag">
+                <i class="fa fa-trash-o"></i>
+              </div>
+            </div>
+            <div class="tag-section" data-bind="visible:deleteMode" style="display:none">
+              <div class="delete-warning">
+                Delete Tag?
+              </div>
+              <div class="tag-del-btn no" title="Cancel">
+                No
+              </div>
+              <div class="tag-del-btn yes" data-bind="event:{mousedown:deleteTagYes}" title="Delete tag">
+                Yes
+              </div>            
+            </div>
+          </li>     
+        </ul>
+        <div class="align-center add-in-list">
+          <a href="" class="btn btn-o btn-primary" data-bind="click:add"><i class="fa fa-plus-circle"></i> Add new tag</a>
+        </div>        
+      </div>
     </div>
-    <div class="spp-content-editor">
-      <pre id="editor"></pre>
+  </section>
+  <section class="list-section" id="snippet-list">
+    <ul class="snippet-list" data-bind="foreach: list">
+      <li class="snippet-li" data-bind="css:{current:current},click:setCurrent">
+        <div class="snippet-li-body">
+          <div class="title" data-bind="text: title"></div>
+          <div class="description" data-bind="text: descriptionFormatted"></div>
+      </div>        
+      </li>
+    </ul>
+  </section>
+  <section class="content-section">
+    <div class="content-body" id="snippet-content">
+      <div class="wrap">
+        <header>
+          <div class="title">
+            <div class="title-content" data-bind="visible:!editingTitle()">
+              <span class="title-to-show" data-bind="text:title"></span> <a href="" data-bind="click:editTitle" class="edit title-edit"><i class="fa fa-pencil"></i> edit</a>
+            </div>
+            <div class="title-edit"  data-bind="visible:editingTitle" style="display:none">
+              <input type="text" value="" data-bind="value:title,hasFocus:editingTitle,event:{blur:saveTitle},keyEnterPressed:saveTitle"/>
+            </div>
+          </div>
+          <div class="description">
+            <div class="description-content" data-bind="visible:!editingDescription()">
+              <span class="description-to-show" data-bind="text:description"></span> <a href="" class="edit title-edit" data-bind="click:editDescription"><i class="fa fa-pencil"></i> edit</a>
+            </div>
+            <div class="description-edit" data-bind="visible:editingDescription" style="display:none">
+              <textarea data-bind="value:description,hasFocus:editingDescription,event:{blur:saveDescription},keyEnterPressed:saveDescription"></textarea>
+            </div>
+          </div>
+        </header>
+        <div class="snippet-tags">
+          <div class="snippet-tags-list" data-bind="foreach:tags">
+            <div class="stag" data-bind="style:{backgroundColor:color}"><span data-bind="text:title"></span><i class="fa fa-times" title="Remove tag"></i></div>
+          </div>
+
+          <a class="stag-add" href="" data-bind="event:{blur:hideAddingTag}">
+            <span data-bind="click:showAddingTag"><i class="fa fa-plus"></i> Add tag</span>
+            <div class="tag-add-selector" data-bind="visible:addingTag" style="display:none">
+              <span class="triang"></span>
+              <div class="tag-add-selector-cuad" data-bind="foreach: tagsLeft">
+                <div class="stag" title="Add tag" data-bind="style:{backgroundColor:color},click:$parent.addToSnippet"><span data-bind="text:title"></span></div>
+              </div>
+            </div>
+          </a>
+            
+        
+
+        </div>
+        <div class="snippet-codes">
+          <div>Codes</div>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
+
+
+
+
+  <!--section class="top-section"></section-->
+
+
 
   <script src="css/less.min.js"></script>
-
-  <script src="js/jquery-1.11.2.min.js"></script>
-  <script src="js/ko.js"></script>
+  <script src="js/jquery-1.11.2.min.js"></script>  
   <script src="js/theme.js"></script>
-  <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
-  <script src="js/collection.js"></script>
-  <script src="js/language.js"></script>
+
+  <script src="js/ko.js"></script>
+  <script src="js/ko.custom.js"></script>
+  <script src="js/tags.js"></script>
+  <script src="js/snippetList.js"></script>
   <script src="js/snippet.js"></script>
-  <script src="js/editor.js"></script>
+  
 
   
   <script src="js/app.js"></script>

@@ -1,18 +1,18 @@
 <?php 
-  include_once('snippet.php');
+  include_once('definition.php');  
 
-  $Snippet = new Snippet();
+  $Snippet = new Snippet();  
 
   $jsondata = array();
 
   if( isset($_GET['all']) ) {
-
-  	$jsondata = $Snippet->getList($_GET['collection_id'],$_GET['language_id']);
-  	/*for ($x=0; $x <count($jsondata); $x++) {
-  		$id = $jsondata[$x][0];
-  		$num = $Language->getCountSnippetsById($id);  	
-  		$jsondata[$x]['num_snippets'] = $num[0][0];
-  	}*/
+    $jsondata = $Snippet->getAll();  
+  }
+  if( isset($_GET['list']) ) {
+    $jsondata = $Snippet->getList($_GET['listIds']);  
+  }
+  if( isset($_GET['numTotal']) ) {
+  	$jsondata = $Snippet->getNumTotal();  
   }
 
   header('Content-type: application/json; charset=utf-8');

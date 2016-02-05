@@ -7,11 +7,6 @@
   <meta name="description" content="">
   <meta name="keywords" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <!-- CSS -->
-  <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css'>
-  <link type="text/css" rel="stylesheet" href="css/reset.css">
-  <link type="text/css" rel="stylesheet" href="css/theme.css">
-  <link type="text/css" rel="stylesheet" href="css/style.css">
 
   <?php
     include_once('classes/conexion.php');
@@ -22,11 +17,11 @@
     <h1>Delete All</h1>
     <?php 
 
-    $t = 'DROP TABLE collections, languages, snippets';
+    $t = 'DROP TABLE snippets,tags,codes,tagbysnippet';
 
     $con = new Conexion();
     $con->set($t);
-
+    echo 'Deleted all tables';
     ?>
   </div>
   

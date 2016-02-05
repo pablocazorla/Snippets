@@ -1,126 +1,125 @@
+if (typeof SnippetApp == 'undefined') SnippetApp = {};
 (function() {
-  "use strict";
-  if (!window.SnippetApp) {
-    window.SnippetApp = {};
-  }
+	"use strict";
 
-  // Individual snippet VM
-  var snippetVM = function(data) {
-    var vm = {
-      id: data.id,
-      title: ko.observable('Untitled'),
-      detail: ko.observable(''),
-      content: ko.observable(''),
-      collection_id: ko.observable(0),
-      language_id: ko.observable(0),
-      collection_title: ko.observable(''),
-      language_title: ko.observable(''),
-      language_lang: ko.observable(''),
-      current: ko.observable(false),
-      editCodeMode: ko.observable(false)
-    };
 
-    vm.update = function(d) {
-      var datanames = ['title', 'detail', 'content', 'collection_id', 'language_id'];
-      for (var i = 0; i < datanames.length; i++) {
-        if (typeof d[datanames[i]] !== 'undefined') {
-          vm[datanames[i]](d[datanames[i]]);
-        }
-      }
-    };
-    vm.setCurrent = function() {
-      if (!vm.current()) {
-        SnippetApp.snippetListVM.current(vm.id);
-      }
-    };
 
-    // Subscriptions
-    vm.collection_id.subscribe(function(v) {
-      var list = SnippetApp.collectionListVM.list();
-      length = list.length;
-      for (var i = 0; i < length; i++) {
-        var colVM = list[i];
-        if (colVM.id == v) {
-          vm.collection_title(colVM.title());
-        }
-      }
-    });
-    vm.language_id.subscribe(function(v) {
-      var list = SnippetApp.languageListVM.list();
-      length = list.length;
-      for (var i = 0; i < length; i++) {
-        var lanVM = list[i];
-        if (lanVM.id == v) {
-          vm.language_title(lanVM.title);
-          vm.language_lang(lanVM.lang);
-        }
-      }
-    });
-    vm.current.subscribe(function(v) {
-      if (v) {
-        SnippetApp.editorVM.update(vm);
-      }
-    });
-    vm.saveContent = function(content) {
-      var parameters = {
-        'saveContent': true,
-        'id': vm.id,
-        'content': content
-      };
-      jQuery.post('classes/snippet/post.php', parameters, function() {
-        // Update snippet content
-        vm.content(content);
-      });
-    };
+	SnippetApp.snippetVM = (function() {
 
-    vm.update(data);
-    return vm;
-  };
+		var currentFromList = false,
+			titleCache = '',
+			descriptionCache = '';
 
-  // List snippet VM
-  SnippetApp.snippetListVM = (function() {
+		var vm = {
+			id: -1,
+			title: ko.observable(),
+			description: ko.observable(),
+			tags: ko.observableArray(),
+			tagsLeft: ko.observableArray(),
+			addingTag:ko.observable(false),
+			editingTitle: ko.observable(false),
+			editingDescription: ko.observable(false)
+		};
+		vm.update = function(snippetVMFromList) {
+			currentFromList = snippetVMFromList;
+			vm.id = currentFromList.id;
+			vm.title(currentFromList.title());
+			vm.description(currentFromList.description());
+			vm.updateTags();
+		};
+		vm.editTitle = function() {
+			titleCache = vm.title();
+			vm.editingTitle(true);
+		};
+		vm.saveTitle = function() {
+			vm.editingTitle(false);
+			var newTitle = vm.title();
+			if (newTitle === '') {
+				newTitle = titleCache;
+				vm.title(titleCache);
+			}
+			if (newTitle !== titleCache) {
+				jQuery.post('classes/snippet/post.php', {
+					'saveTitle': true,
+					'id': vm.id,
+					'title': newTitle
+				});
+			}
+		};
+		vm.editDescription = function() {
+			descriptionCache = vm.description();
+			vm.editingDescription(true);
+		};
+		vm.saveDescription = function() {
+			vm.editingDescription(false);
+			var newDescription = vm.description();
+			if (newDescription === '') {
+				newDescription = descriptionCache;
+				vm.title(descriptionCache);
+			}
+			if (newDescription !== descriptionCache) {
+				jQuery.post('classes/snippet/post.php', {
+					'saveDescription': true,
+					'id': vm.id,
+					'description': newDescription
+				});
+			}
+		};
 
-    var vm = {
-      list: ko.observableArray([]),
-      current: ko.observable(0),
-      DOMbindingId: 'snippet-list-section'
-    };
 
-    vm.update = function(d) {
-      var length = d.length,
-        newList = [];
+		//SnippetApp.tagListVM.list()
+		//SnippetApp.tbs.getTags();
 
-      for (var i = 0; i < length; i++) {
-        var snippetData = d[i];
-        newList.push(snippetVM(snippetData));
-      }
-      vm.list(newList);
-      vm.current(newList[0].id);
-    };
-    vm.get = function() {
-      jQuery.getJSON('classes/snippet/get.php', {
-        'all': true,
-        'collection_id': SnippetApp.collectionListVM.current(),
-        'language_id': SnippetApp.languageListVM.current()
-      }, function(data) {
-        vm.update(data);
-      });
-    };
+		vm.updateTags = function() {
+			var tagsList = [],
+				tagsLeftList = [],
+				listTagIDs = SnippetApp.tbs.getTags(vm.id);
+				SnippetApp.tagListVM.each(function(tVM){
+					if(listTagIDs.indexOf(tVM.id) >= 0){
+						tagsList.push(tVM);
+					}else{
+						tagsLeftList.push(tVM);
+					}
+				});
+				vm.tags(tagsList);
+				vm.tagsLeft(tagsLeftList);
+		};
+		vm.addToSnippet = function(){
+			vm.hideAddingTag();
+			var tagID = this.id;
+			SnippetApp.tbs.addTag(vm.id,tagID);
+		};
+		vm.showAddingTag = function(){
+			vm.addingTag(true);
+		};
+		vm.hideAddingTag = function(){
+			vm.addingTag(false);
+		};
 
-    // Subscriptions
-    vm.current.subscribe(function(v) {
-      var list = vm.list(),
-        length = list.length;
-      for (var i = 0; i < length; i++) {
-        var snpVM = list[i];
-        if (snpVM.id == v) {
-          snpVM.current(true);
-        } else {
-          snpVM.current(false);
-        }
-      }
-    });
+		// Subscriptions
+		vm.title.subscribe(function(v) {
+			if (currentFromList) {
+				currentFromList.title(v);
+			}
+		});
+		vm.description.subscribe(function(v) {
+			if (currentFromList) {
+				currentFromList.description(v);
+			}
+		});
 
-    return vm;
-  })();
+		SnippetApp.tbs.readyNum.subscribe(function() {
+			vm.updateTags();
+		});
+
+
+
+		vm.init = function() {
+			ko.applyBindings(vm, document.getElementById('snippet-content'));
+		};
+
+
+
+		return vm;
+	})();
 })();

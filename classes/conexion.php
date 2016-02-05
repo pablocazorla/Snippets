@@ -20,42 +20,26 @@
       }
       return $res;
     }
+    public function getDB(){      
+      return $this->db;
+    }
 
     public function createTable($name,$fields){
       $sql = 'create table '. $name .' (id int not null auto_increment primary key,'.$fields.')';
       $this->consult($sql);     
     }
 
-    public function addCollection($title){
-      $sql = 'insert into collections values (null,"'.$title.'")';
-      $this->consult($sql);
-    }
-
-    public function addLanguage($title, $lang){
-      $sql = 'insert into languages values (null,"'.$title.'","'.$lang.'")';
-      $this->consult($sql);
-    }
-
-    public function addSnippet($title, $detail, $content, $collection_id, $language_id){
-      $sql = 'insert into snippets values (null,"'.$title.'","'.$detail.'","'.$content.'",'.$collection_id.','.$language_id.')';
-  
-
-
-      
-      $this->consult($sql);
-      echo 'insert into snippets values (null,"'.$title.'","'.$detail.'","'.$content.'",'.$collection_id.','.$language_id.')';
-    }
-
-
-    /*
-
-    private function toTable($res){
+    
+    public function toArray($res){
       $table = array();
       while($row = mysqli_fetch_array($res)){
         $table[]=$row;
       }
       return $table;
     }
+    /*
+
+    
 
     public function getTable($nameTable){
       $res = $this->consult('select * from '. $nameTable);
