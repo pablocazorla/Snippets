@@ -24,8 +24,13 @@
   if( isset($_POST['addTagToSnippet']) ) {   
       // add New Tag to Snippet
       $tbs->add($_POST['snippet_id'],$_POST['tag_id']);
+  }
+  if( isset($_POST['removeTagFromSnippet']) ) {   
+      // add New Tag to Snippet
+      $tbs->deleteTag($_POST['snippet_id'],$_POST['tag_id']);
   } 
 
+  echo 'ok';
   exit();
   
 ?>

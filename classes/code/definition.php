@@ -14,8 +14,23 @@
       $this->conexion->consult($sql);
       echo '<p>Created codes</p>';
     }
-
-       
+    public function add($snippet_id,$content,$language){
+      $sql = 'insert into codes values (null,'.$snippet_id.',"'.$content.'","'.$language.'")';
+      $this->conexion->consult($sql);
+    }
+    public function getCodes($snippet_id){
+      $sql = 'select * from codes where snippet_id='.$snippet_id;
+      $res = $this->conexion->consult($sql);
+      return $this->conexion->toArray($res);
+    }
+    public function updateLanguage($id,$language){
+      $sql = 'update codes set language="'.$language.'" where id = '.$id;
+      $this->conexion->consult($sql);
+    }
+    public function updateContent($id,$content){
+      $sql = 'update codes set content="'.$content.'" where id = '.$id;
+      $this->conexion->consult($sql);
+    }
     
 
   }

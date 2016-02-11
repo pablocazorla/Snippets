@@ -1,19 +1,28 @@
-if (typeof SnippetApp == 'undefined') SnippetApp = {};
 (function() {
 	"use strict";
 
+	/* PRIVATE VARIABLES ***********************************************/
 
-
+	/**
+	 * List of availables colors for tags
+	 * @array
+	 */
 	var colorsAvaliables = ['#CD6CFF', '#FF6CBC', '#C17DA2', '#FF5454', '#C18F7D', '#FF8B52', '#FFA200', '#0AD200', '#CDB972', '#A0B300', '#B0A75D', '#97B379', '#79B3AB', '#2CC2C7', '#39A4FF', '#AEB2C5', '#7D9BC1', '#9587ED'],
 		colorRandom = function() {
 			var i = Math.floor(Math.random() * colorsAvaliables.length);
 			return colorsAvaliables[i];
 		};
 
+	/* PRIVATE VIEWMODELS ***********************************************/
+
+	/**
+	 * Individual tag Viewmodel
+	 * @constructor
+	 * @return {object} tagVM
+	 */
 	var tagVM = function(data) {
 
-		var titleCache = '';
-
+		/* VM TO RETURN ***********************************************/
 		var vm = {
 			id: parseInt(data.id),
 			title: ko.observable(data.title),
@@ -23,17 +32,17 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			deleteMode: ko.observable(false)
 		};
 
-		vm.num = ko.computed(function() {
-			if (SnippetApp.tbs.readyNum() > 0) {
-				return SnippetApp.tbs.getSnippets(vm.id).length;
-			} else {
-				return 0;
-			}
-		});
-		vm.editAndNoDeleteMode = ko.computed(function() {
-			return vm.editMode() && !vm.deleteMode();
-		});
+		/* PRIVATE VARIABLES ***********************************************/
 
+		// Cache for title when edit
+		var titleCache = '';
+
+		/* VARIABLES ***********************************************/
+
+		/**
+		 * List of Color VMs used to change and apply tag color
+		 * @array
+		 */
 		vm.colorList = (function() {
 			var newlist = [],
 				colorVM = function(col) {
@@ -54,18 +63,50 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			return newlist;
 		})();
 
+		/* COMPUTED VARIABLES ***********************************************/
 
+		/**
+		 * Num of snippets for this tag
+		 * @function
+		 * @return number
+		 */
+		vm.num = ko.computed(function() {
+			if (SnippetApp.tbs.onReady() > 0) {
+				return SnippetApp.tbs.getSnippets(vm.id).length;
+			} else {
+				return 0;
+			}
+		});
 
+		/**
+		 * Mode of deleting tag
+		 * @function
+		 * @return boolean
+		 */
+		vm.editAndNoDeleteMode = ko.computed(function() {
+			return vm.editMode() && !vm.deleteMode();
+		});
+
+		/* METHODS ***********************************************/
+
+		/**
+		 * Edit the title of the tag
+		 * @function
+		 */
 		vm.editTitle = function() {
 			titleCache = vm.title();
 			vm.editMode(true);
 		};
-		vm.saveTitle = function() {
 
+		/**
+		 * Save the new title of the tag
+		 * @function
+		 */
+		vm.saveTitle = function() {
 			var newTitle = jQuery.trim(vm.title());
 			if (newTitle !== '' && newTitle !== titleCache) {
 				// update Title
-				jQuery.post('classes/tag/post.php', {
+				SnippetApp.ajax('classes/tag/post.php', {
 					'updateTitle': true,
 					'id': vm.id,
 					'title': newTitle
@@ -75,13 +116,22 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			}
 			vm.editMode(false);
 		};
+
+		/**
+		 * Change the 'delete' mode to true
+		 * @function
+		 */
 		vm.deleteTag = function() {
 			vm.deleteMode(true);
 		};
 
+		/**
+		 * Delete tag
+		 * @function
+		 */
 		vm.deleteTagYes = function() {
 			// delete Tag
-			jQuery.post('classes/tag/post.php', {
+			SnippetApp.ajax('classes/tag/post.php', {
 				'deleteTag': true,
 				'id': vm.id
 			}, function() {
@@ -90,6 +140,7 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			vm.editMode(false);
 			vm.deleteMode(false);
 		};
+
 		/**
 		 * Set current tag
 		 * @function
@@ -103,45 +154,82 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			}
 		};
 
+		/* SUBSCRIPTIONS ***************************************************/
 
+		/**
+		 * When color changes, save the new color to server
+		 * @subscription
+		 */
 		vm.color.subscribe(function(v) {
 			// update Color
-			jQuery.post('classes/tag/post.php', {
+			SnippetApp.ajax('classes/tag/post.php', {
 				'updateColor': true,
 				'id': vm.id,
 				'color': v
 			});
 		});
+
+		/**
+		 * When 'editMode' is false, 'deleteMode' too
+		 * @subscription
+		 */
 		vm.editMode.subscribe(function(v) {
 			if (!v) {
 				vm.deleteMode(false);
 			}
 		});
 
+		/* RETURN VM ***************************************************/
+
 		return vm;
 	};
+
+	/* PUBLIC VIEWMODELS ***********************************************/
+
+	/**
+	 * 'All Snippets' link Viewmodel
+	 * @constructor
+	 * @return {object} allSnippetsListVM
+	 */
 	SnippetApp.allSnippetsListVM = (function() {
+
+		/* VM TO RETURN ***********************************************/
 		var vm = {
 			num: ko.observable(0),
 			current: ko.observable(false)
 		};
+
+		/* METHODS ***********************************************/
+
+		/**
+		 * Update total number of snippets from server
+		 * @function
+		 */
 		vm.update = function() {
-			jQuery.get('classes/snippet/get.php', {
+			SnippetApp.ajax('classes/snippet/get.php', {
 				'numTotal': true
 			}, function(data) {
 				vm.num(data[0]['num']);
 			});
 		};
+
+		/**
+		 * Set current this link, and set not-current all tag links
+		 * @function
+		 */
 		vm.setCurrent = function() {
 			if (!vm.current()) {
-				// Set NOT current tag
 				vm.current(true);
+				// Set NOT current tag links
 				SnippetApp.tagListVM.current(-1);
+
+				// Load snippet list with all snippets
 				SnippetApp.snippetListVM.update();
 			}
 		};
+
 		/**
-		 * Init and bind tag list VM
+		 * Init and bind VM
 		 * @function
 		 */
 		vm.init = function() {
@@ -149,53 +237,96 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			vm.update();
 			vm.setCurrent();
 		};
+
+		/* RETURN VM ***************************************************/
+
 		return vm;
 	})();
 
+	/**
+	 * Tag list Viewmodel
+	 * @constructor
+	 * @return {object} tagListVM
+	 */
 	SnippetApp.tagListVM = (function() {
+
+		/* VM TO RETURN ***********************************************/
 		var vm = {
-			list: ko.observableArray(),
-			current: ko.observable(-1)
+			list: ko.observableArray([]),
+			current: ko.observable(-1),
+			onReady: ko.observable(0),
+			loading: ko.observable(false)
 		};
 
+		/* PRIVATE VARIABLES ***********************************************/
+
+		var readyCount = 0; // Ready counter for execute onReady
+
+		/* PRIVATE METHODS *************************************************/
+
+		/**
+		 * Sort list tag by number of snippets, from max to min
+		 * @function
+		 * @param {array} Opcional: list of collections in JSON format
+		 */
+		var sort = function(li) {
+			var criteria = function(a, b) {
+				if (a.num() < b.num()) return 1;
+				if (a.num() > b.num()) return -1;
+				return 0;
+			};
+			var list = li || vm.list();
+			vm.list(list.sort(criteria));
+		};
+
+		/* METHODS *************************************************/
+
+		/**
+		 * Update tag list from server
+		 * @function
+		 */
 		vm.update = function() {
-			jQuery.getJSON('classes/tag/get.php', {
+			vm.loading(true);
+			SnippetApp.ajax('classes/tag/get.php', {
 				'all': true
 			}, function(data) {
 				var length = data.length,
 					newList = [];
 
 				for (var i = 0; i < length; i++) {
-					// Create a new collection VM and push to list
+					// Create a new tag VM and push to list
 					var newTagVM = tagVM(data[i]);
 					newList.push(newTagVM);
 				}
-				vm.list(newList);
+				sort(newList);
+				vm.loading(false);
 			});
 		};
+
 		/**
-		 * Add new collection
+		 * Add new tag
 		 * @function
 		 */
 		vm.add = function() {
 			// save New Tag
 			var newColor = colorRandom();
-			jQuery.post('classes/tag/post.php', {
+			SnippetApp.ajax('classes/tag/post.php', {
 				'addNewTag': true,
 				'title': 'New tag',
 				'color': newColor
 			}, function(numId) {
 				var newTagVM = tagVM({
 					id: parseInt(numId),
-					'title': '',
+					'title': 'New tag',
 					'color': newColor
 				});
-				vm.list.push(newTagVM);
+				vm.list.splice(0, 0, newTagVM);
 				newTagVM.editTitle();
-				SnippetApp.tbs.update();
+				//SnippetApp.tbs.update();
 			});
 
 		};
+
 		/**
 		 * Iterate in the tag list
 		 * @function
@@ -224,6 +355,12 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			});
 			return tagToReturn;
 		};
+
+		/**
+		 * Quit a tag from list, after delete tag
+		 * @function
+		 * @param {number} The id of the tag VM
+		 */
 		vm.quitFromList = function(id) {
 			var indextoQuit = -1;
 			vm.each(function(tVM, index) {
@@ -237,10 +374,19 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			}
 		}
 
+		/**
+		 * Init and bind VM
+		 * @function
+		 */
+		vm.init = function() {
+			ko.applyBindings(vm, document.getElementById('tag-list'));
+			vm.update();
+		};
 
 		/* SUBSCRIPTIONS ***************************************************/
+
 		/**
-		 * When is current changes, set current the right collection VM
+		 * When current changes, set current the right tag VM
 		 * @subscription
 		 */
 		vm.current.subscribe(function(v) {
@@ -252,109 +398,27 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 				}
 			});
 		});
-		/**
-		 * Init and bind tag list VM
-		 * @function
-		 */
-		vm.init = function() {
-			ko.applyBindings(vm, document.getElementById('tag-list'));
-			vm.update();
-		};
-
-		return vm;
-	})();
-
-	SnippetApp.tbs = (function() {
-
-		var snippet = {},
-			tag = {},
-			readyCount = 0;
-
-
-		var vm = {
-			readyNum: ko.observable(0)
-		};
-		vm.update = function() {
-			jQuery.getJSON('classes/tag/get.php', {
-				'tbs': true
-			}, function(data) {
-				var length = data.length;
-				snippet = {};
-				tag = {};
-
-				for (var i = 0; i < length; i++) {
-					var snippetId = data[i]['snippet_id'],
-						tagId = data[i]['tag_id'];
-					//
-					if (typeof snippet['id' + snippetId] == 'undefined') {
-						snippet['id' + snippetId] = [];
-					}
-					snippet['id' + snippetId].push(parseInt(tagId));
-					//
-					if (typeof tag['id' + tagId] == 'undefined') {
-						tag['id' + tagId] = [];
-					}
-					tag['id' + tagId].push(parseInt(snippetId));
-				};
-				readyCount++;
-				vm.readyNum(readyCount);
-				//SnippetApp.snippetListVM.update();
-			});
-		};
-
-		vm.getTags = function(snippetId) {
-			var listToReturn;
-			if (typeof snippet['id' + snippetId] == 'undefined') {
-				listToReturn = [];
-			} else {
-				listToReturn = snippet['id' + snippetId];
-			}
-			return listToReturn;
-		};
-		vm.getSnippets = function(tagId) {
-			var listToReturn;
-			if (tagId >= 0) {
-				if (typeof tag['id' + tagId] == 'undefined') {
-					listToReturn = [];
-				} else {
-					listToReturn = tag['id' + tagId];
-				}
-			} else {
-				listToReturn = 'all';
-			}
-
-			return listToReturn;
-		};
-
-		vm.addTag = function(snippetId, tagId) {
-			var tagId = parseInt(tagId)
-			if (typeof snippet['id' + snippetId] == 'undefined') {
-				snippet['id' + snippetId] = [];
-			}
-			if (snippet['id' + snippetId].indexOf(tagId) < 0) {
-				// fake update
-				snippet['id' + snippetId].push(tagId);
-				readyCount++;
-				vm.readyNum(readyCount);
-				// to server then
-				jQuery.post('classes/tag/post.php', {
-					'addTagToSnippet':true,
-					'snippet_id':snippetId,
-					'tag_id':tagId
-				},function(){
-					vm.update();
-				});
-			}
-		};
 
 		/**
-		 * Init and bind tag list VM
-		 * @function
+		 * When list changes, set onReady
+		 * @subscription
 		 */
-		vm.init = function() {
-			// without bindings
-			vm.update();
-		};
+		vm.list.subscribe(function() {
+			readyCount++;
+			vm.onReady(readyCount);
+		});
+
+		/**
+		 * When tbs changes, sort the tag list
+		 * @subscription
+		 */
+		SnippetApp.tbs.onReady.subscribe(function() {
+			setTimeout(function() {
+				sort();
+			}, 100);
+		});
+
+		/* RETURN VM ***************************************************/
 
 		return vm;
 	})();

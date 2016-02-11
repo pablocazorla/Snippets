@@ -31,8 +31,9 @@
           </div>
         </li>        
       </ul>
-      <div class="tit">Tags</div>
+      
       <div  id="tag-list">
+        <div class="tit">Tags <i class="fa fa-plus float-right add-tag-top" title="Add Tag" data-bind="click:add"></i></div>
         <ul class="tag-list" data-bind="foreach: list">
           <li class="tag-li-element" data-bind="css:{current:current},style:{backgroundColor: current() ? color : 'transparent'}">
             <div class="tag-section" data-bind="visible:!editMode()">
@@ -73,9 +74,7 @@
             </div>
           </li>     
         </ul>
-        <div class="align-center add-in-list">
-          <a href="" class="btn btn-o btn-primary" data-bind="click:add"><i class="fa fa-plus-circle"></i> Add new tag</a>
-        </div>        
+        <div  class="loader" data-bind="css:{show:loading}"><div  class="loader-bg"></div><i class="fa fa-spinner fa-pulse"></i></div>  
       </div>
     </div>
   </section>
@@ -88,6 +87,7 @@
       </div>        
       </li>
     </ul>
+    <div  class="loader" data-bind="css:{show:loading}"><div  class="loader-bg"></div><i class="fa fa-spinner fa-pulse"></i></div>
   </section>
   <section class="content-section">
     <div class="content-body" id="snippet-content">
@@ -112,24 +112,34 @@
         </header>
         <div class="snippet-tags">
           <div class="snippet-tags-list" data-bind="foreach:tags">
-            <div class="stag" data-bind="style:{backgroundColor:color}"><span data-bind="text:title"></span><i class="fa fa-times" title="Remove tag"></i></div>
+            <div class="stag" data-bind="style:{backgroundColor:color}"><span data-bind="text:title"></span><i class="fa fa-times" title="Remove tag" data-bind="click:$parent.removeFromSnippet"></i></div>
           </div>
 
-          <a class="stag-add" href="" data-bind="event:{blur:hideAddingTag}">
+          <a class="stag-add" href="" data-bind="event:{blur:hideAddingTag},visible: tagsLeft().length > 0">
             <span data-bind="click:showAddingTag"><i class="fa fa-plus"></i> Add tag</span>
             <div class="tag-add-selector" data-bind="visible:addingTag" style="display:none">
               <span class="triang"></span>
               <div class="tag-add-selector-cuad" data-bind="foreach: tagsLeft">
-                <div class="stag" title="Add tag" data-bind="style:{backgroundColor:color},click:$parent.addToSnippet"><span data-bind="text:title"></span></div>
+                <div class="stag" title="Add tag" data-bind="style:{backgroundColor:color},click:$parent.addTagToSnippet"><span data-bind="text:title"></span></div>
               </div>
             </div>
           </a>
-            
-        
-
         </div>
-        <div class="snippet-codes">
-          <div>Codes</div>
+        <div class="snippet-codes" data-bind="foreach:codes">
+          <div class="code-container" data-bind="css:{editing:editing}">
+            <div class="code-header">
+              <div class="code-language">
+                <select title="Select language" data-bind="options:languagesAvailables,optionsText:'title',optionsValue:'val',value:language"></select>
+              </div>
+              <a  class="edit action-code" data-bind="click:edit"><i class="fa fa-pencil"></i> Edit code</a>
+              <a  class="save action-code" data-bind="click:saveEdit"><i class="fa fa-pencil"></i> Save code</a>
+              <span class="or action-code">or</span>
+              <a  class="cancel action-code" data-bind="click:cancelEdit">Cancel</a>
+            </div>
+            <div class="code-container-pre">
+              <pre data-bind="attr: { id: 'editor-'+ id}"></pre>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -146,9 +156,13 @@
   <script src="js/jquery-1.11.2.min.js"></script>  
   <script src="js/theme.js"></script>
 
+  <script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+
   <script src="js/ko.js"></script>
-  <script src="js/ko.custom.js"></script>
+  <script src="js/boot.js"></script>
+  <script src="js/tbs.js"></script>
   <script src="js/tags.js"></script>
+
   <script src="js/snippetList.js"></script>
   <script src="js/snippet.js"></script>
   

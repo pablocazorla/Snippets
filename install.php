@@ -59,6 +59,13 @@
       $TagBySnippets->add($i,3);
     }
     
+    // Add some codes
+    for($i = 1;$i<=20;$i++){
+      $Codes->add($i,'var src = Ejemplo'.$i.';','javascript');
+      $Codes->add($i,'.ejemplo'.$i.'{display:none;}','css');
+      $Codes->add($i,'h1 Este es el ejemplo '.$i.' h1','html');
+    }
+    
     
 
     ?>

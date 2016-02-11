@@ -152,3 +152,5 @@ Pandora.tabs = {
 		});
 	}
 };
+
+// jQuery('document').ready(Pandora.init);

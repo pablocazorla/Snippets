@@ -1,18 +1,33 @@
-if (typeof SnippetApp == 'undefined') SnippetApp = {};
 (function() {
 	"use strict";
 
+	/* PRIVATE VIEWMODELS ***********************************************/
+
+	/**
+	 * Individual snippet Viewmodel
+	 * @constructor
+	 * @return {object} snippetVM
+	 */
 	var snippetVM = function(data) {
 
+		/* VM TO RETURN ***********************************************/
 		var vm = {
 			id: data.id,
 			title: ko.observable(data.title),
 			description: ko.observable(data.description),
 			current: ko.observable(false)
 		};
+
+		/* COMPUTED VARIABLES ***********************************************/
+
+		/**
+		 * TShort text for description
+		 * @function
+		 * @return string
+		 */
 		vm.descriptionFormatted = ko.computed(function() {
 			var length = vm.description().length,
-				max = 80;
+				max = 44;
 			if (length > max) {
 				return vm.description().substring(0, (max - 3)) + '...';
 			} else {
@@ -23,6 +38,8 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 				}
 			}
 		});
+
+		/* METHODS ***********************************************/
 
 		/**
 		 * Set current Snippet
@@ -36,15 +53,33 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			}
 		};
 
+		/* RETURN VM ***************************************************/
+
 		return vm;
 	};
 
+	/* PUBLIC VIEWMODELS ***********************************************/
+
+	/**
+	 * Snippet list Viewmodel
+	 * @constructor
+	 * @return {object} snippetListVM
+	 */
 	SnippetApp.snippetListVM = (function() {
+
+		/* VM TO RETURN ***********************************************/
 		var vm = {
 			list: ko.observableArray(),
-			current: ko.observable(0)
+			current: ko.observable(0),
+			loading: ko.observable(false)
 		};
 
+		/* METHODS *************************************************/
+
+		/**
+		 * Update snippet list from server
+		 * @function
+		 */
 		vm.update = function() {
 			var tagID = SnippetApp.tagListVM.current();
 			var listIDs = SnippetApp.tbs.getSnippets(tagID);
@@ -59,8 +94,8 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 						'listIds': listIDs
 					};
 				}
-
-				jQuery.getJSON('classes/snippet/get.php', parameters, function(data) {
+				vm.loading(true);
+				SnippetApp.ajax('classes/snippet/get.php', parameters, function(data) {
 					var length = data.length,
 						newList = [];
 
@@ -74,16 +109,17 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 						newList[0].current(true);
 					}
 					vm.list(newList);
+					vm.loading(false);
 				});
 			} else {
 				vm.list([]);
 			}
-
 		};
+
 		/**
-		 * Iterate in the tag list
+		 * Iterate in the snippet list
 		 * @function
-		 * @param {function} Method to execute, receiving a tag VM as parameter
+		 * @param {function} Method to execute, receiving a snippet VM as parameter
 		 */
 		vm.each = function(callback) {
 			var list = vm.list(),
@@ -93,12 +129,18 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			}
 		};
 
+		/**
+		 * Init and bind VM
+		 * @function
+		 */
 		vm.init = function() {
 			ko.applyBindings(vm, document.getElementById('snippet-list'));
 		};
+
 		/* SUBSCRIPTIONS ***************************************************/
+
 		/**
-		 * When is current changes, set current the right collection VM
+		 * When is current changes, set current the snippet collection VM
 		 * @subscription
 		 */
 		vm.current.subscribe(function(v) {
@@ -111,7 +153,7 @@ if (typeof SnippetApp == 'undefined') SnippetApp = {};
 			});
 		});
 
-
+		/* RETURN VM ***************************************************/
 
 		return vm;
 	})();

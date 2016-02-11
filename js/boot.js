@@ -1,5 +1,7 @@
-(function() {
+SnippetApp = (function() {
 	"use strict";
+
+	// Customize Knockout JS
 	if (typeof ko !== 'undefined') {
 		ko.bindingHandlers.keyEnterPressed = {
 			init: function(element, valueAccessor, allBindings, viewModel) {
@@ -15,4 +17,21 @@
 			}
 		};
 	}
+
+	var app = {};
+
+	app.ajax = function(url, parameters, callback) {
+		var t = (url.indexOf('post.php') >= 0) ? 'POST' : 'GET';
+		var cbk = callback || function() {};
+		$.ajax({
+			type: t,
+			url: url,
+			data: parameters,
+			success: function(data) {
+				cbk(data);
+			}
+		});
+	};
+
+	return app;
 })();

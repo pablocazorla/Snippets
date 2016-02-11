@@ -11,7 +11,7 @@
       // Update color
       $Snippet->updateDescription($_POST['id'],$_POST['description']);    
   }
-
+  echo 'ok';
   exit();
   
 ?>

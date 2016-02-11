@@ -69,7 +69,12 @@
       $sql = 'insert into tagbysnippet values (null,'.$snippet_id.','.$tag_id.')';
       $this->conexion->consult($sql);
     }
+    public function deleteTag($snippet_id,$tag_id){
+      
+      $sql = 'delete from tagbysnippet where snippet_id='.$snippet_id.' and tag_id='.$tag_id;
+      $this->conexion->consult($sql);
 
+    }
 
 
     public function getByTag($tag_id){
