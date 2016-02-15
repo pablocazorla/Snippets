@@ -17,7 +17,7 @@
     <h1>Delete All</h1>
     <?php 
 
-    $t = 'DROP TABLE snippets,tags,codes,tagbysnippet';
+    $t = 'DROP TABLE snippets,tags,codes,tagbysnippet,users';
 
     $con = new Conexion();
     $con->set($t);

@@ -28,6 +28,9 @@ SnippetApp = (function() {
 			url: url,
 			data: parameters,
 			success: function(data) {
+				if(data == 'logout'){
+					window.location.href = 'login.php';
+				}
 				cbk(data);
 			}
 		});

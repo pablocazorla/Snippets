@@ -10,7 +10,7 @@
     }
 
     public function install(){
-      $sql = 'create table tags (id int not null auto_increment primary key,title varchar(200),color varchar(40))';
+      $sql = 'create table if not exists tags (id int not null auto_increment primary key,title varchar(200),color varchar(40))';
       $this->conexion->consult($sql);
       echo '<p>Created tags</p>';
     }
@@ -54,7 +54,7 @@
     }
 
     public function install(){
-      $sql = 'create table tagbysnippet (id int not null auto_increment primary key,snippet_id int,tag_id int)';
+      $sql = 'create table if not exists tagbysnippet (id int not null auto_increment primary key,snippet_id int,tag_id int)';
       $this->conexion->consult($sql);
       echo '<p>Created tagbysnippet</p>';
     }

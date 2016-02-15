@@ -1,17 +1,21 @@
-<?php 
-  include_once('definition.php');  
+<?php
+  session_start();
+  if(isset($_SESSION["us"])){
+	  include_once('definition.php');  
 
-  $Code = new Code();  
+	  $Code = new Code();  
 
-  $jsondata = array();
+	  $jsondata = array();
 
 
-  if( isset($_GET['list']) ) {
-    $jsondata = $Code->getCodes($_GET['snippet_id']);  
+	  if( isset($_GET['list']) ) {
+	    $jsondata = $Code->getCodes($_GET['snippet_id']);  
+	  }
+
+	  header('Content-type: application/json; charset=utf-8');
+	  echo json_encode($jsondata);
+	  exit();
+  }else{
+    echo 'logout';
   }
-
-  header('Content-type: application/json; charset=utf-8');
-  echo json_encode($jsondata);
-  exit();
-
 ?>

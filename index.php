@@ -1,3 +1,7 @@
+<?php 
+  session_start();
+  if(isset($_SESSION["us"])){
+?>
 <!doctype HTML>
 <html lang="en">
 <head>
@@ -17,6 +21,7 @@
     <div class="container">
       <div class="brand">
         <h1>Snippets</h1>
+        <a href="classes/user/logout.php">Salir</a>
       </div>
       <ul class="tag-list main-tag-list" id="main-tag-list">
         <li class="tag-li-element" data-bind="css:{current:current},click:setCurrent">
@@ -171,3 +176,8 @@
   <script src="js/app.js"></script>
 </body>
 </html>
+<?php 
+  }else{
+    header("Location: login.php");
+  }
+?>

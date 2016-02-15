@@ -10,7 +10,7 @@
     }
 
     public function install(){
-      $sql = 'create table snippets (id int not null auto_increment primary key,title varchar(200), description text)';
+      $sql = 'create table if not exists snippets (id int not null auto_increment primary key,title varchar(200), description text)';
       $this->conexion->consult($sql);
       echo '<p>Created snippets</p>';
     }

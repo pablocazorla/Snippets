@@ -10,7 +10,7 @@
     }
 
     public function install(){
-      $sql = 'create table codes (id int not null auto_increment primary key,snippet_id int,content text,language varchar(50))';
+      $sql = 'create table if not exists codes (id int not null auto_increment primary key,snippet_id int,content text,language varchar(50))';
       $this->conexion->consult($sql);
       echo '<p>Created codes</p>';
     }

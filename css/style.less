@@ -573,6 +573,10 @@ label {
   margin: 0 0 4px;
   color: @body-alt-color;
 }
+label.required::before {
+  content: '* ';
+  color: #00aff3;
+}
 input[type="text"],
 input[type="tel"],
 input[type="email"],
@@ -634,4 +638,104 @@ select {
   background: url('../img/select-bg.png') right center no-repeat;
   padding-right: 20px;
   cursor: pointer;
+}
+.validationMessage{
+  color: #D00;
+  font-size: 10px;
+  line-height: 1.1em;
+  margin: 0;
+}
+input[type="text"].error,
+input[type="tel"].error,
+input[type="email"].error,
+input[type="password"].error,
+input[type="date"].error,
+input[type="month"].error,
+input[type="week"].error,
+input[type="time"].error,
+input[type="datetime"].error,
+input[type="datetime-local"].error,
+input[type="file"].error,
+input[type="number"].error,
+input[type="color"].error,
+input[type="search"].error,
+input[type="url"].error,
+textarea.error,
+select.error,
+.error input[type="text"],
+.error input[type="tel"],
+.error input[type="email"],
+.error input[type="password"],
+.error input[type="date"],
+.error input[type="month"],
+.error input[type="week"],
+.error input[type="time"],
+.error input[type="datetime"],
+.error input[type="datetime-local"],
+.error input[type="file"],
+.error input[type="number"],
+.error input[type="color"],
+.error input[type="search"],
+.error input[type="url"],
+.error textarea,
+.error select {
+  border-color: #D00;
+}
+.input-help {
+  color: #999;
+  font-size: 11px;
+  margin: 0;
+  padding-top: 0.2em;
+}
+
+
+
+
+
+.form-big{
+  label {
+    font-size: 14px;
+    line-height: 1.3em;
+    margin: 0 0 3px;
+  }
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  input[type="password"],
+  input[type="date"],
+  input[type="month"],
+  input[type="week"],
+  input[type="time"],
+  input[type="datetime"],
+  input[type="datetime-local"],
+  input[type="file"],
+  input[type="number"],
+  input[type="color"],
+  input[type="search"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 14px;
+    padding: 0.7em;
+    line-height: 1em;
+  }
+  fieldset{
+    margin: 0 0 15px;
+  }
+}
+
+//////////////////////////////////////////////
+.log-box{
+  background-color: #FFF;
+  padding: 30px;
+  width: 400px;
+  margin: 30px auto;
+  box-shadow: 0 2px 4px rgba(0,0,0,.2);
+}
+#login-error{
+  .validationMessage{
+    font-size: 14px;
+    line-height: 1.3em;
+  }
+
 }
