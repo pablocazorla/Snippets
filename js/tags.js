@@ -28,14 +28,17 @@
 			title: ko.observable(data.title),
 			color: ko.observable(data.color),
 			current: ko.observable(false),
+			showEditor: ko.observable(false),
 			editMode: ko.observable(false),
-			deleteMode: ko.observable(false)
+			inputFocus: ko.observable(false)
 		};
 
 		/* PRIVATE VARIABLES ***********************************************/
 
 		// Cache for title when edit
-		var titleCache = '';
+		var titleCache = '',
+			// Cache for title when edit
+			colorCache = '';
 
 		/* VARIABLES ***********************************************/
 
@@ -78,31 +81,29 @@
 			}
 		});
 
-		/**
-		 * Mode of deleting tag
-		 * @function
-		 * @return boolean
-		 */
-		vm.editAndNoDeleteMode = ko.computed(function() {
-			return vm.editMode() && !vm.deleteMode();
-		});
-
 		/* METHODS ***********************************************/
 
 		/**
 		 * Edit the title of the tag
 		 * @function
 		 */
-		vm.editTitle = function() {
+		vm.editTag = function() {
 			titleCache = vm.title();
-			vm.editMode(true);
+			colorCache = vm.color();
+			SnippetApp.tagListVM.showEditor(vm.id);
+			vm.inputFocus(true);
+		};
+		vm.cancelEditTag = function() {
+			vm.title(titleCache);
+			vm.color(colorCache);
+			SnippetApp.tagListVM.showEditor(-1);
 		};
 
 		/**
 		 * Save the new title of the tag
 		 * @function
 		 */
-		vm.saveTitle = function() {
+		vm.saveEdit = function() {
 			var newTitle = jQuery.trim(vm.title());
 			if (newTitle !== '' && newTitle !== titleCache) {
 				// update Title
@@ -114,7 +115,15 @@
 			} else {
 				vm.title(titleCache);
 			}
-			vm.editMode(false);
+			if (vm.color() !== colorCache) {
+				// update Color
+				SnippetApp.ajax('classes/tag/post.php', {
+					'updateColor': true,
+					'id': vm.id,
+					'color': vm.color()
+				});
+			}
+			SnippetApp.tagListVM.showEditor(-1);
 		};
 
 		/**
@@ -122,7 +131,11 @@
 		 * @function
 		 */
 		vm.deleteTag = function() {
-			vm.deleteMode(true);
+			vm.editMode(false);
+		};
+
+		vm.cancelDeleteTag = function() {
+			SnippetApp.tagListVM.showEditor(-1);
 		};
 
 		/**
@@ -137,8 +150,7 @@
 			}, function() {
 				SnippetApp.tagListVM.quitFromList(vm.id);
 			});
-			vm.editMode(false);
-			vm.deleteMode(false);
+			SnippetApp.tagListVM.showEditor(-1);
 		};
 
 		/**
@@ -146,7 +158,7 @@
 		 * @function
 		 */
 		vm.setCurrent = function() {
-			if (!vm.current()) {
+			if (!vm.current() && !vm.showEditor()) {
 				SnippetApp.allSnippetsListVM.current(false);
 				// Set current by id tag
 				SnippetApp.tagListVM.current(vm.id);
@@ -154,30 +166,7 @@
 			}
 		};
 
-		/* SUBSCRIPTIONS ***************************************************/
 
-		/**
-		 * When color changes, save the new color to server
-		 * @subscription
-		 */
-		vm.color.subscribe(function(v) {
-			// update Color
-			SnippetApp.ajax('classes/tag/post.php', {
-				'updateColor': true,
-				'id': vm.id,
-				'color': v
-			});
-		});
-
-		/**
-		 * When 'editMode' is false, 'deleteMode' too
-		 * @subscription
-		 */
-		vm.editMode.subscribe(function(v) {
-			if (!v) {
-				vm.deleteMode(false);
-			}
-		});
 
 		/* RETURN VM ***************************************************/
 
@@ -196,8 +185,10 @@
 		/* VM TO RETURN ***********************************************/
 		var vm = {
 			num: ko.observable(0),
-			current: ko.observable(false)
+			current: ko.observable(false),
+			onReady: ko.observable(0)
 		};
+		var readyCount = 0; // Ready counter for execute onReady
 
 		/* METHODS ***********************************************/
 
@@ -210,6 +201,8 @@
 				'numTotal': true
 			}, function(data) {
 				vm.num(data[0]['num']);
+				readyCount++;
+				vm.onReady(readyCount);
 			});
 		};
 
@@ -233,10 +226,13 @@
 		 * @function
 		 */
 		vm.init = function() {
-			ko.applyBindings(vm, document.getElementById('main-tag-list'));
+			ko.applyBindings(vm, document.getElementById('allSnippetsListVM'));
 			vm.update();
 			vm.setCurrent();
 		};
+
+		
+
 
 		/* RETURN VM ***************************************************/
 
@@ -254,8 +250,11 @@
 		var vm = {
 			list: ko.observableArray([]),
 			current: ko.observable(-1),
+			showEditor: ko.observable(-1),
 			onReady: ko.observable(0),
-			loading: ko.observable(false)
+			loading: ko.observable(false),
+			shownMenu: ko.observable(false)
+
 		};
 
 		/* PRIVATE VARIABLES ***********************************************/
@@ -269,15 +268,33 @@
 		 * @function
 		 * @param {array} Opcional: list of collections in JSON format
 		 */
-		var sort = function(li) {
-			var criteria = function(a, b) {
+		var sortOptions = {
+			count: function(a, b) {
 				if (a.num() < b.num()) return 1;
 				if (a.num() > b.num()) return -1;
 				return 0;
-			};
-			var list = li || vm.list();
-			vm.list(list.sort(criteria));
+			},
+			atoz: function(a, b) {
+				if (a.title().toLowerCase() > b.title().toLowerCase()) return 1;
+				if (a.title().toLowerCase() < b.title().toLowerCase()) return -1;
+				return 0;
+			},
+			ztoa: function(a, b) {
+				if (a.title().toLowerCase() < b.title().toLowerCase()) return 1;
+				if (a.title().toLowerCase() > b.title().toLowerCase()) return -1;
+				return 0;
+			}
 		};
+
+		var criteria = 'count';
+		var sort = function(li) {
+			var list = li || vm.list();
+			vm.list(list.sort(sortOptions[criteria]));
+		};
+
+		vm.empty = ko.computed(function() {
+			return vm.list().length <= 0;
+		});
 
 		/* METHODS *************************************************/
 
@@ -299,6 +316,8 @@
 					newList.push(newTagVM);
 				}
 				sort(newList);
+				readyCount++;
+				vm.onReady(readyCount);
 				vm.loading(false);
 			});
 		};
@@ -308,6 +327,7 @@
 		 * @function
 		 */
 		vm.add = function() {
+			vm.shownMenu(false);
 			// save New Tag
 			var newColor = colorRandom();
 			SnippetApp.ajax('classes/tag/post.php', {
@@ -321,10 +341,24 @@
 					'color': newColor
 				});
 				vm.list.splice(0, 0, newTagVM);
-				newTagVM.editTitle();
+				newTagVM.editTag();
 				//SnippetApp.tbs.update();
 			});
+		};
 
+		vm.showMenu = function() {
+			vm.shownMenu(true);
+		};
+		vm.hideMenu = function() {
+			vm.shownMenu(false);
+		};
+
+		vm.orderBy = function(str) {
+			if(vm.shownMenu()){
+				vm.shownMenu(false);
+				criteria = str;
+				sort();
+			}			
 		};
 
 		/**
@@ -379,7 +413,7 @@
 		 * @function
 		 */
 		vm.init = function() {
-			ko.applyBindings(vm, document.getElementById('tag-list'));
+			ko.applyBindings(vm, document.getElementById('tagListVM'));
 			vm.update();
 		};
 
@@ -395,6 +429,17 @@
 					tVM.current(true);
 				} else {
 					tVM.current(false);
+				}
+			});
+		});
+
+		vm.showEditor.subscribe(function(v) {
+			vm.each(function(tVM) {
+				if (tVM.id == v) {					
+					tVM.editMode(true);
+					tVM.showEditor(true);
+				} else {
+					tVM.showEditor(false);
 				}
 			});
 		});

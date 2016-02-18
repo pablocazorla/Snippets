@@ -17,6 +17,8 @@
     public function add($snippet_id,$content,$language){
       $sql = 'insert into codes values (null,'.$snippet_id.',"'.$content.'","'.$language.'")';
       $this->conexion->consult($sql);
+      $db = $this->conexion->getDB();
+      return mysqli_insert_id($db);
     }
     public function getCodes($snippet_id){
       $sql = 'select * from codes where snippet_id='.$snippet_id;
@@ -31,7 +33,10 @@
       $sql = 'update codes set content="'.$content.'" where id = '.$id;
       $this->conexion->consult($sql);
     }
-    
+    public function deleteCode($id){      
+      $sql = 'delete from codes where id='.$id;
+      $this->conexion->consult($sql);
+    }
 
   }
 ?>

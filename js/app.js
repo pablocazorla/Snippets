@@ -8,5 +8,30 @@ jQuery('document').ready(function() {
 				SnippetApp[a].init();
 			}
 		}
+		window.SnippetApp.updateScroll();
+
+		var timeToStart = setInterval(function() {
+			if (
+				SnippetApp.tbs.onReady() > 0 &&
+				SnippetApp.allSnippetsListVM.onReady() > 0 &&
+				SnippetApp.snippetListVM.onReady() > 0 &&
+				SnippetApp.tagListVM.onReady() > 0 &&
+				SnippetApp.snippetVM.onReady() > 0
+			) {
+				clearInterval(timeToStart);
+				timeToStart = null;
+				jQuery('#loading-start').fadeOut(400,function(){
+					jQuery('#loading-dimmer').fadeOut(500);
+				});
+			}
+		}, 600);
+
+		jQuery('#logout-link').click(function(){
+			jQuery('#loading-dimmer').fadeIn(400,function(){
+				window.SnippetApp.logout();
+			});			
+		});
 	};
+
+
 });

@@ -18,6 +18,8 @@
     public function add($title,$description){
       $sql = 'insert into snippets values (null,"'.$title.'","'.$description.'")';
       $this->conexion->consult($sql);
+      $db = $this->conexion->getDB();
+      return mysqli_insert_id($db);
     }
 
     public function getAll(){
@@ -50,6 +52,17 @@
     }
     public function updateDescription($id,$description){
       $sql = 'update snippets set description="'.$description.'" where id = '.$id;
+      $this->conexion->consult($sql);
+    }
+
+    public function deleteSnippet($id){      
+      $sql = 'delete from snippets where id='.$id;
+      $this->conexion->consult($sql);
+
+      $sql = 'delete from tagbysnippet where snippet_id='.$id;
+      $this->conexion->consult($sql);
+
+      $sql = 'delete from codes where snippet_id='.$id;
       $this->conexion->consult($sql);
     }
 
