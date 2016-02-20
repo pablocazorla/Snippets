@@ -12,6 +12,7 @@ jQuery('document').ready(function() {
 
 		var timeToStart = setInterval(function() {
 			if (
+				SnippetApp.preferencesVM.onReady() > 0 &&
 				SnippetApp.tbs.onReady() > 0 &&
 				SnippetApp.allSnippetsListVM.onReady() > 0 &&
 				SnippetApp.snippetListVM.onReady() > 0 &&
@@ -26,6 +27,9 @@ jQuery('document').ready(function() {
 			}
 		}, 600);
 
+		jQuery('#preferences-link').click(function(){
+			window.SnippetApp.preferencesVM.show();			
+		});
 		jQuery('#logout-link').click(function(){
 			jQuery('#loading-dimmer').fadeIn(400,function(){
 				window.SnippetApp.logout();

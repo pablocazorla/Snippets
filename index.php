@@ -94,7 +94,7 @@
     </div>
     <ul class="list-account">
       <hr/>
-      <li>
+      <li id="preferences-link">
         <div class="tag-background"></div>
         <span class="icon-tool"><i class="fa fa-cog"></i></span>
         <span class="title">Preferences</span>
@@ -241,43 +241,43 @@
     <div class="text">Loading your Snippets...</div>
   </div> 
 
-  <div class="modal" id="preferencesVM" style="display:none">
-    <div class="dimmer"></div>
+  <div class="modal" id="preferencesVM" data-bind="fadeVisible:shown" style="display:none">
+    <div class="dimmer" data-bind="click:hide"></div>
     <div class="box">
-      <i class="fa fa-times modal-close" title="Close"></i>
+      <i class="fa fa-times modal-close" data-bind="click:hide" title="Close"></i>
       <div class="preferences-container">
         <div class="title">Preferences</div>
         <div class="row clearfix">
           <div class="col s6">
             <fieldset>
               <label>Username: *</label>
-              <input type="text" value="Pablo Cazorla"/>
+              <input type="text" value="" data-bind="value:username,hasFocus:setUsernameFocus" placeholder="Your Username"/>
             </fieldset>
             <fieldset>
               <label>Email: *</label>
-              <input type="text" value="pablo.david.cazorla@gmail.com"/>
+              <input type="text" value="" data-bind="value:email" placeholder="Your Email"/>
             </fieldset>
             <div class="row clearfix">
               <div class="col s6">
                 <fieldset>
                   <label>UI color:</label>
-                  <select><option>Light</option><option>Dark</option></select>
+                  <select data-bind="options:uiColorsAvailables,optionsText:'title',optionsValue:'val',value:ui_color"></select>
                   <i class="fa fa-caret-down"></i>
                 </fieldset>
               </div>
               <div class="col s6">
                 <fieldset>
                   <label>Code theme:</label>
-                  <select><option>Light</option><option>Dark</option></select>
+                  <select data-bind="options:codeThemesAvailables,optionsText:'title',optionsValue:'val',value:code_theme"></select>
                   <i class="fa fa-caret-down"></i>
                 </fieldset>
               </div>
             </div>
           </div>
           <div class="col s6">
-            <div>
+            <div data-bind="visible:!editingPassword()">
               <fieldset>
-                <label>Password: *</label>
+                <label>Password:</label>
                 <div class="pass-edit">
                   <i class="fa fa-circle"></i>
                   <i class="fa fa-circle"></i>
@@ -287,31 +287,31 @@
                   <i class="fa fa-circle"></i>
                   <i class="fa fa-circle"></i>
                   <i class="fa fa-circle"></i>
-                  <a href="" class="edit">
+                  <a href="" class="edit" data-bind="click:editPassword">
                     <i class="fa fa-pencil"></i>
                     Edit
                   </a>
                 </div>
               </fieldset>
             </div>
-            <div style="display:none">
+            <div data-bind="slideVisible:editingPassword" style="display:none">
               <fieldset>
                 <label>Enter old Password: *</label>
-                <input type="password" value="sdfsdfsdfdsf"/>
+                <input type="password" value="" data-bind="value:oldPassword,hasFocus:setPassFocus" placeholder="Your old Password"/>
               </fieldset>
               <fieldset>
                 <label>Enter new Password: *</label>
-                <input type="password" value="sdfsdfsdfdsf"/>
+                <input type="password" value="" data-bind="value:newPassword" placeholder="New Password"/>
               </fieldset>
               <fieldset>
                 <label>Enter new Password again: *</label>
-                <input type="password" value="sdfsdfsdfdsf"/>
+                <input type="password" value="" data-bind="value:newPasswordRepeat" placeholder="Repeat new Password"/>
               </fieldset>
             </div>            
           </div>  
         </div>
         <div class="actions">
-          <a data-bind="" class="btn color-primary btn-big" href="">Save</a> <span class="btn btn-or btn-big">or</span> <a data-bind="" class="btn btn-cancel btn-big" href="">Cancel</a>
+          <a class="btn color-primary btn-big" data-bind="click:save" href=""><i class="fa fa-pencil fa-spin" data-bind="visible:saving"></i> <span data-bind="text:saveBtnText"></span></a> <span class="btn btn-or btn-big">or</span> <a class="btn btn-cancel btn-big" data-bind="click:hide" href="">Cancel</a>
         </div>
       </div>
     </div>
@@ -326,12 +326,15 @@
   <script src="js/ko.js"></script>
 
   <script src="js/boot.js"></script>
+  <script src="js/preferences.js"></script>
   <script src="js/tbs.js"></script>
 
   <script src="js/tags.js"></script>
 
   <script src="js/snippetList.js"></script>
   <script src="js/snippet.js"></script>
+
+  
   
 
   

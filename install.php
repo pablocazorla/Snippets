@@ -85,7 +85,7 @@
     }
     echo 'Add some codes<br>';
     // Add basic user
-    $Users->add('pablo','123456','pablo.david.cazorla@gmail.com');
+    $Users->add('pablo','123456','pablo.david.cazorla@gmail.com','light','molokai');
     echo 'Add basic user<br>';
 
     ?>

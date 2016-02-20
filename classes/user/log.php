@@ -4,13 +4,13 @@
 
   $User = new User();  
 
-  $isLogged = $User->isLogged($_POST['username'],$_POST['password']);
+  $idLogged = $User->isLogged($_POST['username'],$_POST['password']);
 
   $messageToReturn = '';
   
-  if($isLogged){
+  if($idLogged > 0){
     // SESSION
-    $_SESSION["us"] = $_POST['username'];    
+    $_SESSION["us"] = $idLogged;    
     $messageToReturn = 'true';
   }else{
     $messageToReturn = 'false';

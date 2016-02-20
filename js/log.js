@@ -21,11 +21,6 @@
 
 	vm.errors = ko.validation.group(vm);
 
-	/*jQuery('#submit-btn').click(function(e) {
-		e.preventDefault();
-		vm.errors.showAllMessages();
-	});*/
-
 	vm.subm = function() {
 		if (vm.errors().length === 0) {
 			jQuery.post('classes/user/log.php', {
